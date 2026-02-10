@@ -32,7 +32,8 @@ RUN conda run -n robodiff python -m pip install "mujoco==2.3.7" --only-binary=:a
  && conda run -n robodiff python -m pip install -r diffusion_policy/pip_requirements.txt \
  && conda run -n robodiff python -m pip install -U pip wheel \ 
  && conda run -n robodiff python -m pip install --force-reinstall --no-cache-dir "setuptools==69.5.1" \
- && conda run -n robodiff python -m pip install -U wandb
+ && conda run -n robodiff python -m pip install -U wandb \
+ && conda run -n robodiff python -m pip install -U "huggingface_hub==0.19.4"
 
 RUN pip3 install --no-cache-dir -U "lerobot[pusht]"
 
