@@ -20,14 +20,12 @@ parquets = sorted(episodes_root.glob("chunk-*/**/*.parquet"))
 if not parquets:
     raise RuntimeError(f"No parquet files found under {episodes_root}")
 
-# Load all episode rows first, compute global prefix sums, then write back per parquet.
 all_rows = []
-row_sources = []  # (parquet_path, row_indices_in_that_df)
+row_sources = []
 
 for pq in parquets:
     df = pd.read_parquet(pq)
 
-    # infer episode ordering: prefer episode_index if exists, otherwise keep file order
     if "episode_index" in df.columns:
         order = np.argsort(df["episode_index"].to_numpy())
         df = df.iloc[order].reset_index(drop=True)
@@ -57,8 +55,7 @@ for pq in parquets:
 
 all_df = pd.concat(all_rows, ignore_index=True)
 
-# Global ordering: by episode_index if it looks global, else by parquet then row
-# If episode_index exists and is unique-ish, use it.
+
 use_ep = all_df["_episode_index"].is_monotonic_increasing or all_df["_episode_index"].nunique() > 0.9 * len(all_df)
 if use_ep:
     all_df = all_df.sort_values("_episode_index").reset_index(drop=True)
@@ -98,7 +95,6 @@ for pq_str, g in grouped:
         # restore original row order
         df_out = df_sorted.iloc[inv].reset_index(drop=True)
     else:
-        # assume current row order equals g order
         if len(df) != len(g):
             raise RuntimeError(f"Row count mismatch for {pq}")
         df_out = df.copy()

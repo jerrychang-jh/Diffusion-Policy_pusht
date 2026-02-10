@@ -54,7 +54,7 @@ def read_zarr_chunk(array_dir: Path, chunk_coords, zmeta: dict):
     shape = list(zmeta["shape"])
     order = zmeta.get("order", "C")
 
-    # Logical "actual" chunk size at the dataset boundary
+    # chunk size at the dataset boundary
     actual = []
     starts = []
     for dim, csz, idx in zip(shape, chunks, chunk_coords):
@@ -63,20 +63,20 @@ def read_zarr_chunk(array_dir: Path, chunk_coords, zmeta: dict):
         starts.append(start)
         actual.append(max(0, end - start))
 
-    # How many elements are stored in this chunk buffer?
+    # How many elements are stored in this chunk buffer
     stored_elems = len(raw) // dtype.itemsize
     nominal_elems = int(np.prod(chunks))
     actual_elems = int(np.prod(actual))
 
     arr = np.frombuffer(raw, dtype=dtype)
 
-    # Common case: stored as full nominal chunk (even for edge chunk)
+    # stored as full nominal chunk
     if stored_elems == nominal_elems:
         blk = arr.reshape(chunks, order=order)
         slicer = tuple(slice(0, a) for a in actual)
         return blk[slicer]
 
-    # Other case: stored as truncated edge chunk
+    # stored as truncated edge chunk
     if stored_elems == actual_elems:
         return arr.reshape(actual, order=order)
 
@@ -132,17 +132,17 @@ def main(
     n_contacts_meta = read_json(n_contacts_dir / ".zarray")
     episode_ends_meta = read_json(episode_ends_dir / ".zarray")
 
-    # ---- Read episode ends (1 chunk in your dataset)
+    # ---- Read episode ends (1 chunk)
     episode_ends = read_zarr_chunk(episode_ends_dir, (0,), episode_ends_meta).astype(np.int64)
     total_frames = int(img_meta["shape"][0])
     assert int(episode_ends[-1]) == total_frames, "episode_ends last value must match total frames"
 
-    # ---- Prepare output location (LeRobot writes under HF_LEROBOT_HOME / repo_id)
+    # ---- Prepare output location
     out_path = HF_LEROBOT_HOME / out_repo_id
     if out_path.exists():
         shutil.rmtree(out_path)
 
-    # ---- Create LeRobot dataset (v3 writer)
+    # ---- Create LeRobot dataset
     dataset = LeRobotDataset.create(
         repo_id=out_repo_id,
         robot_type=robot_type,
@@ -159,12 +159,11 @@ def main(
             "n_contacts": {"dtype": "float32", "shape": (1,), "names": ["n_contacts"]},
             # "task": {"dtype": "string", "shape": (), "names": ["task"]},
         },
-        # keep these small; PushT is not huge
         image_writer_threads=4,
         image_writer_processes=1,
     )
 
-    # ---- Stream all modalities chunk-by-chunk (axis0 chunk size is 161 in your data)
+    # ---- Stream all modalities chunk-by-chunk
     img_chunks = iter_axis0_chunks(img_dir, img_meta)
     action_chunks = iter_axis0_chunks(action_dir, action_meta)
     state_chunks = iter_axis0_chunks(state_dir, state_meta)
@@ -207,7 +206,6 @@ def main(
 
             global_t += 1
 
-            # If we just reached end of an episode, finalize it.
             if global_t == ep_end:
                 dataset.save_episode()
                 ep_idx += 1
@@ -219,8 +217,6 @@ def main(
 
 
 if __name__ == "__main__":
-    # Example:
-    # python zarr_to_lerobot_v3.py /path/to/pusht_cchi_v1.zarr
     import sys
 
     zarr_root = sys.argv[1]

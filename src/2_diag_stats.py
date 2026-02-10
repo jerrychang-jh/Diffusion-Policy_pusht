@@ -12,7 +12,6 @@ print("type(meta.stats) =", type(meta_stats))
 if meta_stats is None:
     print("meta.stats is None")
 else:
-    # meta_stats may be a dict-like; attempt to inspect keys & values
     try:
         keys = list(meta_stats.keys())
     except Exception as e:

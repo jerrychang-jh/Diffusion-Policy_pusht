@@ -10,7 +10,6 @@ STATS_PATH = ROOT / "meta" / "stats.json"
 
 ds = LeRobotDataset(repo_id="local/pusht_cchi_v1_lerobotv3", root=str(ROOT))
 
-# load existing stats.json
 stats = {}
 if STATS_PATH.exists():
     with open(STATS_PATH, "r") as f:

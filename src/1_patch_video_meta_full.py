@@ -42,7 +42,7 @@ def ffprobe_info(mp4: Path):
     duration = st.get("duration")
     duration = float(duration) if duration is not None else None
 
-    # fps from avg_frame_rate (like "30/1")
+    # fps from avg_frame_rate
     def parse_frac(s):
         if not s or s == "0/0":
             return None
@@ -105,7 +105,6 @@ for pq in parquets:
         df[COLS["fps"]] = float(fps)
         changed = True
     if COLS["nframes"] not in df.columns:
-        # allow None -> will still write NaN; better to have int
         df[COLS["nframes"]] = int(nframes) if nframes is not None else int(round(duration * fps))
         changed = True
 

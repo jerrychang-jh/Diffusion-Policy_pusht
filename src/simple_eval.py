@@ -26,8 +26,8 @@ FPS = 10
 OUT_DIR = Path(f"outputs/eval/lerobot/{DATASET}/pusht_videos")
 OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-RECORD_EPISODES = {0, 1, 2}  # record only first few episodes (change as you like)
-MAX_FRAMES = 500            # safety cap
+RECORD_EPISODES = {0, 1, 2}
+MAX_FRAMES = 500 
 
 
 def transform_env_obs_to_policy_obs(env_obs: dict, device: torch.device) -> dict:
@@ -65,8 +65,6 @@ def to_env_action(action) -> np.ndarray:
         action = action.detach().cpu().numpy()
     action = np.asarray(action)
 
-    # Many LeRobot policies output (N, act_dim) already for vector envs
-    # Ensure float32
     return action.astype(np.float32)
 
 
@@ -75,13 +73,11 @@ def main():
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # 1) env (LeRobot factory returns dict-of-envs)
     env_map = make_env(PushtEnv())
     tg = next(iter(env_map))
     tid = next(iter(env_map[tg]))
-    env = env_map[tg][tid]  # likely SyncVectorEnv(num_envs=1)
+    env = env_map[tg][tid]
 
-    # 2) policy
     policy = DiffusionPolicy.from_pretrained(ckpt_dir)
     policy.to(device).eval()
 
@@ -109,25 +105,20 @@ def main():
             frames.append(frame0)
 
         while not done:
-            # 3) obs transform -> policy obs
             obs = transform_env_obs_to_policy_obs(env_obs, device=device)
 
-            # 4) policy action
             with torch.no_grad():
                 action = policy.select_action(obs)
 
-            # 5) step env
             env_action = to_env_action(action)
             step_out = env.step(env_action)
 
-            # Gymnasium vector env: obs, reward, terminated, truncated, info
             env_obs, reward, terminated, truncated, info = step_out
 
             if SAVE_MEDIA and print_and_save and len(frames) < MAX_FRAMES:
                 frame = np.asarray(env_obs["pixels"][0])  # (H,W,C)
                 frames.append(frame)
 
-            # reward could be shape (N,)
             r = float(np.asarray(reward).mean())
             ep_ret += r
 
@@ -135,11 +126,8 @@ def main():
 
         returns.append(ep_ret)
 
-        # success signal (best-effort)
         success = None
-        # info might be dict or list/tuple of dicts (vector env)
         if isinstance(info, (list, tuple)) and len(info) > 0 and isinstance(info[0], dict):
-            # take first env
             cand = info[0]
         elif isinstance(info, dict):
             cand = info
@@ -165,7 +153,6 @@ def main():
 
             if SAVE_MP4:
                 mp4_path = OUT_DIR / f"ep_{ep:04d}.mp4"
-                # imageio wants ndarray frames; pixels are already uint8 RGB
                 with imageio.get_writer(mp4_path, fps=FPS, codec="libx264", quality=8) as w:
                     for fr in frames:
                         w.append_data(fr)
