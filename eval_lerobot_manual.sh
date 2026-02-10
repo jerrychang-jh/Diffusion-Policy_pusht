@@ -1,0 +1,1 @@
+python3 src/simple_eval.py

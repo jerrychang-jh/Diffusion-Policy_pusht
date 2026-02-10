@@ -1,0 +1,9 @@
+.vscode/
+
+outputs/
+
+data/
+
+Dataset/lerobot_v3/
+Dataset/zarr/pusht_cchi_v1.zarr/
+Dataset/zarr/pusht_cchi_v2.zarr/

@@ -1,0 +1,1 @@
+docker build -f docker/Dockerfile -t lerobot-stanford-pusht:pytorch2.7.1-cuda11.8-cudnn9 . 
