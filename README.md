@@ -105,7 +105,7 @@ Evaluation (Stanford eval logs):
 | pusht_cchi_v1 | 50 | 0.837 | 64% (32/50) | ![v1 eval](images/stanford_pusht_cchi_v1_epochs_705.gif) |
 | pusht_cchi_v2 | 50 | 0.836 | 64% (32/50) | ![v2 eval](images/stanford_pusht_cchi_v2_epochs_900.gif) |
 
-Notes: Mean Score is the normalized episode score (0–1) from `outputs/eval/stanford/*/eval_log.json`. Success rate counts episodes with `sim_max_reward >= 0.95` (interpreted as successful trials). Full per-episode values and rollout videos are available under the corresponding `outputs/train/stanford/.../eval/` folders. There is also a separate raw-reward summary at `outputs/eval/diffusion_pusht/last/eval_info.json` (100-episode run), but the Stanford eval logs are used as the canonical submission metrics.
+Notes: Mean Score is the normalized episode score (0–1) from `outputs/eval/stanford/*/eval_log.json`. Success rate counts episodes with `sim_max_reward >= 0.95` (interpreted as successful trials). Full per-episode values and rollout videos are available under the corresponding `outputs/train/stanford/.../eval/` folders. 
 
 ## Key Observations & Analysis
 
