@@ -43,7 +43,7 @@ source docker/lerobot_stanford_gpu_run_attach.sh
 
 ### Clone and Data Preparation
 ```bash
-git clone https://github.com/jerrychang-jh/Diffusion-Policy-PushT.git
+git clone https://github.com/jerrychang-jh/Diffusion-Policy_pusht.git
 cd Diffusion-Policy-PushT
 source unzip_original_dataset.sh
 ```
