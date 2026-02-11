@@ -24,27 +24,12 @@ This repository documents implementation of the Diffusion Policy, training and e
     └── eval/
 ```
 
-## Quick Start
-
-### 1. Clone and Setup
-```bash
-git clone https://github.com/jerrychang-jh/Diffusion-Policy-PushT.git
-cd Diffusion-Policy-PushT
-source unzip_original_dataset.sh
-```
-
-### 2. Build Docker Environment
-```bash
-source docker/build.sh
-source docker/lerobot_stanford_gpu_run_attach.sh
-```
-
 ## Repository Setup
 
 ### Clone and Data Preparation
 ```bash
 git clone https://github.com/jerrychang-jh/Diffusion-Policy_pusht.git
-cd Diffusion-Policy-PushT
+cd Diffusion-Policy_pusht
 source unzip_original_dataset.sh
 ```
 
